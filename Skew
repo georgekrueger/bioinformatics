@@ -1,0 +1,12 @@
+
+def findSkew(s):
+    skew = 0
+    skewList = []
+    for c in s:
+        if c == 'C':
+            skew -= 1
+        if c == 'G':
+            skew += 1
+        skewList += skew
+    return skewList
+    
