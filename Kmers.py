@@ -54,33 +54,47 @@ class KmerTree:
     def findMostFrequentKmersWithMismatch(self, m):
         self.mostFrequent = []
         self.mostFrequentNum = 0
+        self.mostFrequentMap = {}
         self.findMostFrequentKmersWithMismatchRecursive(self.root, "", m, 0)
+        #print self.mostFrequentMap
+        for k,v in self.mostFrequentMap.iteritems():
+            if v == self.mostFrequentNum:
+                self.mostFrequent.append(k)
+            elif v > self.mostFrequentNum:
+                self.mostFrequentNum = v
+                self.mostFrequent = [k]
         return self.mostFrequent
 
     def findMostFrequentKmersWithMismatchRecursive(self, node, s, m, mismatches):
         if mismatches > m:
             return
-        #print "checking mismatched string: %s (mismatch: %s)" % (s, mismatches)
+        
         if node.level == self.k:
-            print "%s (%s) %s" % (s, node.count, mismatches)
-            if node.count == self.mostFrequentNum:
-                self.mostFrequent.append(s)
-            elif node.count > self.mostFrequentNum:
-                self.mostFrequentNum = node.count
-                self.mostFrequent = [s]
+            if s in self.mostFrequentMap:
+                self.mostFrequentMap[s] += node.count
+            else:
+                self.mostFrequentMap[s] = node.count
             return
         for k,v in node.nodes.iteritems():
             self.findMostFrequentKmersWithMismatchRecursive(v, s+k, m, mismatches)
+
         # traverse paths that don't exist for mismatches
         for k in ["T", "A", "C", "G"]:
-            if k not in node.nodes.keys():
-                self.findMostFrequentKmersWithMismatchRecursive(KmerNode(node.level+1, node.count), s+k, m, mismatches+1)
+                for k2,v2 in node.nodes.iteritems():
+                    if k2 != k:
+                        self.findMostFrequentKmersWithMismatchRecursive(v2, s+k, m, mismatches+1)
             
 
-tree = KmerTree("ACGTTGCATGTCGCATGATGCATGAGAGCT", 4)
-tree.printTree()
-print tree.findMostFrequentKmersWithMismatch(1)
-print tree.mostFrequentNum
+f = open("stepic_dataset.txt")
+buff = f.readline().split(' ')
+text = buff[0]
+k = int(buff[1])
+d = int(buff[2])
+tree = KmerTree(text, k)
+#tree = KmerTree("AACAAGCTGATAAACATTTAAAGAG", 5)
+#tree.printTree()
+mostFreq = tree.findMostFrequentKmersWithMismatch(d)
+print " ".join(mostFreq)
 
 #tree = KmerTree(text, 9)
 #print tree.findMostFrequentKmers()
