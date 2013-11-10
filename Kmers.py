@@ -1,4 +1,6 @@
 
+import DnaReverseComplement
+
 class KmerNode:
     def __init__(self, level, count=1):
         self.nodes = {}
@@ -74,6 +76,13 @@ class KmerTree:
                 self.mostFrequentMap[s] += node.count
             else:
                 self.mostFrequentMap[s] = node.count
+                
+            revComp = DnaReverseComplement.dnaReverseComplement(s)
+            if revComp in self.mostFrequentMap:
+                self.mostFrequentMap[revComp] += node.count
+            else:
+                self.mostFrequentMap[revComp] = node.count
+                
             return
         for k,v in node.nodes.iteritems():
             self.findMostFrequentKmersWithMismatchRecursive(v, s+k, m, mismatches)
@@ -85,19 +94,17 @@ class KmerTree:
                         self.findMostFrequentKmersWithMismatchRecursive(v2, s+k, m, mismatches+1)
             
 
-f = open("stepic_dataset.txt")
-buff = f.readline().split(' ')
-text = buff[0]
-k = int(buff[1])
-d = int(buff[2])
-tree = KmerTree(text, k)
-#tree = KmerTree("AACAAGCTGATAAACATTTAAAGAG", 5)
-#tree.printTree()
-mostFreq = tree.findMostFrequentKmersWithMismatch(d)
-print " ".join(mostFreq)
+if __name__ == "__main__":
+    f = open("stepic_dataset.txt")
+    buff = f.readline().split(' ')
+    text = buff[0]
+    k = int(buff[1])
+    d = int(buff[2])
+    tree = KmerTree(text, k)
+    #tree = KmerTree("ACGTTGCATGTCGCATGATGCATGAGAGCT", 5)
+    #tree.printTree()
+    mostFreq = tree.findMostFrequentKmersWithMismatch(d)
+    print " ".join(mostFreq)
 
-#tree = KmerTree(text, 9)
-#print tree.findMostFrequentKmers()
-#print tree.mostFrequentNum
 
 
