@@ -8,11 +8,18 @@ def dnaComplementChar(c):
         return 'C'
     elif c == 'C':
         return 'G'
+    return None
 
 def dnaComplementStr(s):
     out = ""
+    i = 0
     for c in s:
-        out += dnaComplementChar(c)
+        revChar = dnaComplementChar(c)
+        if revChar is None:
+            print "dnaComplementStr: Unknown character at location: %s in string: %s" % (i, s)
+            continue
+        out += revChar
+        i += 1
     return out
 
 def reverseStr(s):
