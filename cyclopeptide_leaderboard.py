@@ -9,8 +9,38 @@ def mass(pep):
     return tot
 
 def score(pep, spectrum):
+    p = sorted(pep)
+    s = sorted(spectrum)
+    i = 0
+    j = 0
+    common = 0
+    while i < len(p) and j < len(s):
+        if p[i] == s[j]:
+            common  += 1
+            j += 1
+            i += 1
+        elif p[i] < s[j]:
+            i += 1
+        elif s[j] < p[i]:
+            j += 1
+            
+    return common
     
-
+#print score([1, 2, 2, 4, 6], [5, 6, 2, 2, 3])
+    
+# trim leaderboard to the top n peptides based on scoring with spectrum
+def trimLeaderboard(leaderboard, spectrum, n):
+    scored = []
+    for p in leaderboard:
+        scored.append((p, score(p, spectrum)))
+    scored.sort(key=lambda tup: tup[1], reverse=True)
+    i = 0
+    newLeaderboard = []
+    while i < n or (i < len(scored) and scored[i] == scored[i-1]):
+        newLeaderboard.append(scored[i][1])
+        
+    return newLeaderboard
+    
 def LeaderboardCyclopeptideSequencing(spectrum, n):
     leaderboard = [[]]
     leaderPeptide = None
@@ -29,6 +59,13 @@ def LeaderboardCyclopeptideSequencing(spectrum, n):
                     continue
                 newLeaderboard.append(pep)
 
-        leaderboard = cutLeaderboard(newLeaderboard, spectrum, n)
+        leaderboard = trimLeaderboard(newLeaderboard, spectrum, n)
 
     print(leaderPeptide)
+
+    
+f = open("data.txt")
+n = int(f.readline().strip())
+spectrum = [ for int(x) in f.readline.strip().split(" ") ]
+print n
+print spectrum
