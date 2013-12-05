@@ -41,7 +41,7 @@ def trimLeaderboard(leaderboard, spectrum, n):
         
     return newLeaderboard
     
-def LeaderboardCyclopeptideSequencing(spectrum, n):
+def leaderboardCyclopeptideSequencing(spectrum, n):
     leaderboard = [[]]
     leaderPeptide = None
 
@@ -62,10 +62,13 @@ def LeaderboardCyclopeptideSequencing(spectrum, n):
         leaderboard = trimLeaderboard(newLeaderboard, spectrum, n)
 
     print(leaderPeptide)
+    print leaderboard
 
     
 f = open("data.txt")
 n = int(f.readline().strip())
-spectrum = [ for int(x) in f.readline.strip().split(" ") ]
+spectrum = [ int(x) for x in f.readline().strip().split(" ") ]
 print n
 print spectrum
+
+leaderboardCyclopeptideSequencing(spectrum, n)
