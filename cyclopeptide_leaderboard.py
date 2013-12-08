@@ -36,19 +36,25 @@ def trimLeaderboard(leaderboard, spectrum, n):
     scored.sort(key=lambda tup: tup[1], reverse=True)
     i = 0
     newLeaderboard = []
-    while i < n or (i < len(scored) and scored[i] == scored[i-1]):
+    while (i < len(scored) and (i < n or scored[i] == scored[i-1])):
         newLeaderboard.append(scored[i][1])
+        i += 1
         
     return newLeaderboard
     
 def leaderboardCyclopeptideSequencing(spectrum, n):
     leaderboard = [[]]
+    print(len(leaderboard))
     leaderPeptide = None
-
-    while len(leaderboard) > 0:
-        for pep in leaderboard:
-            for mass in masses:
-                leaderboard.append(pep + [mass])
+    numAddedOnPass = 1
+    while len(leaderboard) > 0 and numAddedOnPass > 0:
+        print("here")
+        numAddedOnPass = 0
+        for i in range(0, len(leaderboard)):
+            print("!!!")
+            for m in masses:
+                leaderboard.append(leaderboard[i] + [m])
+        print("here2")
         parentMass = spectrum[len(spectrum)-1]
         newLeaderboard = []
         for pep in leaderboard:
@@ -58,17 +64,20 @@ def leaderboardCyclopeptideSequencing(spectrum, n):
                 elif mass(pep) > parentMass:
                     continue
                 newLeaderboard.append(pep)
+                numAddedOnPass += 1
+                
+        print(numAddedOnPass)
 
         leaderboard = trimLeaderboard(newLeaderboard, spectrum, n)
 
     print(leaderPeptide)
-    print leaderboard
+    print(leaderboard)
 
     
 f = open("data.txt")
 n = int(f.readline().strip())
 spectrum = [ int(x) for x in f.readline().strip().split(" ") ]
-print n
-print spectrum
+print(n)
+print(spectrum)
 
 leaderboardCyclopeptideSequencing(spectrum, n)
