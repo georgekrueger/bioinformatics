@@ -32,52 +32,57 @@ def score(pep, spectrum):
 def trimLeaderboard(leaderboard, spectrum, n):
     scored = []
     for p in leaderboard:
-        scored.append((p, score(p, spectrum)))
+        scored.append((p, score(p[1], spectrum)))
     scored.sort(key=lambda tup: tup[1], reverse=True)
     i = 0
     newLeaderboard = []
     while (i < len(scored) and (i < n or scored[i] == scored[i-1])):
-        newLeaderboard.append(scored[i][1])
+        newLeaderboard.append(scored[i][0])
         i += 1
-        
     return newLeaderboard
     
 def leaderboardCyclopeptideSequencing(spectrum, n):
-    leaderboard = [[]]
-    print(len(leaderboard))
+    leaderboard = [[False, []]]
     leaderPeptide = None
     numAddedOnPass = 1
+    parentMass = spectrum[len(spectrum)-1]
+    print("parentMass: %s" % parentMass)
+    passNum = 0
     while len(leaderboard) > 0 and numAddedOnPass > 0:
-        print("here")
         numAddedOnPass = 0
-        for i in range(0, len(leaderboard)):
-            print("!!!")
+        leaderboardLen = len(leaderboard)
+        passNum += 1
+        print("pass: %s" % passNum)
+        for i in range(0, leaderboardLen):
+            #print ("leaderboard[i]=%s" % leaderboard[i])
+            if leaderboard[i][0] == True:
+                # If this item has already been expanded, then don't do it again
+                continue
             for m in masses:
-                leaderboard.append(leaderboard[i] + [m])
-        print("here2")
-        parentMass = spectrum[len(spectrum)-1]
-        newLeaderboard = []
-        for pep in leaderboard:
-            if mass(pep) == parentMass:
-                if leaderPeptide is None or score(pep) > score(leaderPeptide):
-                    leaderPeptide = pep
-                elif mass(pep) > parentMass:
+                newPep = leaderboard[i][1] + [m]
+                if mass(newPep) == parentMass:
+                    if leaderPeptide is None or score(newPep, spectrum) > score(leaderPeptide, spectrum):
+                        leaderPeptide = newPep
+                elif mass(newPep) > parentMass:
+                    #print("throw out %s" % mass(newPep))
                     continue
-                newLeaderboard.append(pep)
+                leaderboard.append([False, newPep])
+                #print(leaderboard)
                 numAddedOnPass += 1
-                
+                # this pep has been expanded
+                leaderboard[i][0] = True
+
+        leaderboard = trimLeaderboard(leaderboard, spectrum, n)
+        print(len(leaderboard))
         print(numAddedOnPass)
 
-        leaderboard = trimLeaderboard(newLeaderboard, spectrum, n)
-
-    print(leaderPeptide)
-    print(leaderboard)
+    print("-".join([str(x) for x in leaderPeptide]))
+    print("mass of leader: %s" % mass(leaderPeptide))
 
     
 f = open("data.txt")
 n = int(f.readline().strip())
 spectrum = [ int(x) for x in f.readline().strip().split(" ") ]
-print(n)
 print(spectrum)
 
 leaderboardCyclopeptideSequencing(spectrum, n)
